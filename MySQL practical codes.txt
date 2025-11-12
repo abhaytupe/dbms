@@ -1,0 +1,665 @@
+Q. Design and Develop SQL DDL statements on Schema given. Schema: employee_master(emp_id,firstname, middle, lastname, department, managerid.) branch_master(branched , branchname) 
+1. Insert records in branch_master 
+2. Insert records in employee_master. 
+3. Create index on emp_name column of employee_master. 
+4. Create a view containing employee details
+
+ANS:
+CREATE TABLE branch_master (
+    branch_id INT PRIMARY KEY,
+    branch_name VARCHAR(100) NOT NULL
+);
+CREATE TABLE employee_master (
+    emp_id INT PRIMARY KEY,
+    firstname VARCHAR(50) NOT NULL,
+    middle VARCHAR(50),
+    lastname VARCHAR(50) NOT NULL,
+    department VARCHAR(50),
+    managerid INT,
+    branch_id INT,
+    FOREIGN KEY (managerid) REFERENCES employee_master(emp_id),
+    FOREIGN KEY (branch_id) REFERENCES branch_master(branch_id)
+);
+INSERT INTO branch_master (branch_id, branch_name)
+VALUES
+(1, 'Head Office'),
+(2, 'Regional Office - East'),
+(3, 'Regional Office - West'),
+(4, 'Regional Office - North'),
+(5, 'Regional Office - South');
+
+INSERT INTO employee_master (emp_id, firstname, middle, lastname, department, managerid, branch_id)
+VALUES
+(101, 'John', 'A', 'Smith', 'HR', NULL, 1),
+(102, 'Alice', 'B', 'Johnson', 'Finance', 101, 1),
+(103, 'Robert', NULL, 'Brown', 'IT', 101, 2),
+(104, 'Maria', 'C', 'Garcia', 'Sales', 102, 3),
+(105, 'David', NULL, 'Wilson', 'Marketing', 103, 4);
+
+CREATE INDEX idx_emp_firstname ON employee_master(firstname);
+
+CREATE VIEW vw_employee_details AS
+SELECT
+    e.emp_id,
+    CONCAT(e.firstname, ' ', IFNULL(e.middle, ''), ' ', e.lastname) AS emp_name,
+    e.department,
+    b.branch_name,
+    e.managerid
+FROM employee_master e
+JOIN branch_master b ON e.branch_id = b.branch_id;
+
+SELECT * FROM vw_employee_details;
+
+
+
+
+
+
+
+
+
+Q2. Create a university/college database containing following tables- Student (stud_id, deptnm, sem, name, yr, credits) Teaches (teacher_id,teacher_name,salary, deptnm)
+ 1. Insert records in to all tables.
+ 2. Update record on student tables as department name comp to IT. 
+3. Find the department that has highest or average salary
+ 4. Delete the records of all teachers with salary below2000.
+ 5. Find the sum of salary of each department
+ANS:
+CREATE TABLE Student (
+    stud_id INT PRIMARY KEY,
+    deptnm VARCHAR(50),
+    sem INT,
+    name VARCHAR(100),
+    yr INT,
+    credits INT
+);
+
+CREATE TABLE Teaches (
+    teacher_id INT PRIMARY KEY,
+    teacher_name VARCHAR(100),
+    salary DECIMAL(10,2),
+    deptnm VARCHAR(50)
+);
+
+INSERT INTO Student (stud_id, deptnm, sem, name, yr, credits)
+VALUES
+(1, 'COMP', 3, 'Amit Kumar', 2024, 18),
+(2, 'MECH', 5, 'Priya Sharma', 2023, 22),
+(3, 'CIVIL', 2, 'Rohit Verma', 2024, 15),
+(4, 'COMP', 1, 'Neha Singh', 2025, 10),
+(5, 'ELEC', 4, 'Vikram Patel', 2023, 20);
+
+INSERT INTO Teaches (teacher_id, teacher_name, salary, deptnm)
+VALUES
+(101, 'Dr. Abasaheb', 5500, 'COMP'),
+(102, 'Dr. Tatyasaheb', 4800, 'MECH'),
+(103, 'Dr. Ajinath', 6200, 'CIVIL'),
+(104, 'Dr. Pradip', 3000, 'ELEC'),
+(105, 'Dr. Mohan', 1800, 'COMP');
+-- SET SQL_SAFE_UPDATES = 0;
+UPDATE Student
+SET deptnm = 'IT'
+WHERE deptnm = 'COMP';
+-- SET SQL_SAFE_UPDATES = 1;
+
+SELECT deptnm, AVG(salary) AS avg_salary
+FROM Teaches
+GROUP BY deptnm
+ORDER BY avg_salary DESC
+LIMIT 1;
+-- SET SQL_SAFE_UPDATES = 0;
+DELETE FROM Teaches
+WHERE salary < 2000;
+-- SET SQL_SAFE_UPDATES = 1;
+
+SELECT deptnm, SUM(salary) AS total_salary
+FROM Teaches
+GROUP BY deptnm;
+
+SELECT * FROM Student;
+SELECT * FROM Teaches;
+
+Q3.Emp(empIdint,empNamevarchar(10),empSalint,empDeptId int) Dept (deptIdint,deptNamevarchar(10)) Set appropriate primary key and Foreignkey. 
+1. Create table Emp(empID) and Dept(deptID). 
+2. Add Not Null constraint to empName. 
+3. Insert few Records.
+4. Add column deptloc varchar(10) to dept table.
+ANS:
+CREATE TABLE Dept (
+    deptId INT PRIMARY KEY,
+    deptName VARCHAR(10)
+);
+
+CREATE TABLE Emp (
+    empId INT PRIMARY KEY,
+    empName VARCHAR(10),
+    empSal INT,
+    empDeptId INT,
+    FOREIGN KEY (empDeptId) REFERENCES Dept(deptId)
+);
+ALTER TABLE Emp
+MODIFY empName VARCHAR(10) NOT NULL;
+
+INSERT INTO Dept (deptId, deptName)
+VALUES
+(1, 'HR'),
+(2, 'IT'),
+(3, 'Finance'),
+(4, 'Sales');
+
+INSERT INTO Emp (empId, empName, empSal, empDeptId)
+VALUES
+(101, 'Amit', 5000, 2),
+(102, 'Neha', 6000, 1),
+(103, 'Raj', 5500, 3),
+(104, 'Pooja', 7000, 4);
+ALTER TABLE Dept
+ADD deptLoc VARCHAR(10);
+
+SELECT * FROM Dept;
+SELECT * FROM Emp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Q4. Emp(empId int,empName varchar (10), empSal int,empDeptId int) Dept(deptId int,deptName varchar(10)) 
+1. Insert few Record. 
+2. List employees belonging to department 30,40,or10 
+3. List the employee details whose salary is between10000 to 30000.
+ 4. List total no of employee. 
+5. List average sal of each deptID. 
+6. List employee details in ascending order of salary
+ANS:
+
+CREATE TABLE Dept (
+    deptId INT PRIMARY KEY,
+    deptName VARCHAR(10)
+);
+
+CREATE TABLE Emp (
+    empId INT PRIMARY KEY,
+    empName VARCHAR(10),
+    empSal INT,
+    empDeptId INT,
+    FOREIGN KEY (empDeptId) REFERENCES Dept(deptId)
+);
+INSERT INTO Dept (deptId, deptName)
+VALUES
+(10, 'HR'),
+(20, 'Finance'),
+(30, 'IT'),
+(40, 'Sales');
+
+INSERT INTO Emp (empId, empName, empSal, empDeptId)
+VALUES
+(101, 'Amit', 12000, 10),
+(102, 'Neha', 25000, 20),
+(103, 'Raj', 18000, 30),
+(104, 'Pooja', 32000, 40),
+(105, 'Kiran', 15000, 10),
+(106, 'Arun', 28000, 30);
+
+SELECT *
+FROM Emp
+WHERE empDeptId IN (10, 30, 40);
+
+SELECT *
+FROM Emp
+WHERE empSal BETWEEN 10000 AND 30000;
+
+SELECT COUNT(*) AS total_employees
+FROM Emp;
+
+SELECT empDeptId, AVG(empSal) AS average_salary
+FROM Emp
+GROUP BY empDeptId;
+
+SELECT *
+FROM Emp
+ORDER BY empSal ASC;
+
+
+
+
+
+
+Q5. Stored Procedure :create stored procedure to calculate fine of students.
+ 1. Borrower(Roll_no,Name,DateofIssue,NameofBook,Status)
+ 2. Fine(Roll_no,Date,Amt) 
+* Accept Roll_no and Name of Book from user. * Check the number of days(from date of issue). * If days arebetween15 to30 thenfineamountwillbeRs.5 per day. * If no. of days > 30,per dayfinewillbeRs50 per day and for dayslessthan30,Rs.5perday. * After submitting the book, status will change from I to R. * I fconditionoffineistrue,thendetailswillbestoredintofinetable. * Alsohandlestheexceptionbynamedexception handler
+
+ANS:
+CREATE TABLE Borrower (
+    Roll_no INT PRIMARY KEY,
+    Name VARCHAR(50),
+    DateOfIssue DATE,
+    NameOfBook VARCHAR(100),
+    Status CHAR(1)  -- 'I' = Issued, 'R' = Returned
+);
+
+CREATE TABLE Fine (
+    Fine_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Roll_no INT,
+    Date DATE,
+    Amt DECIMAL(10,2),
+    FOREIGN KEY (Roll_no) REFERENCES Borrower(Roll_no)
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE Calc_Fine (
+    IN p_RollNo INT,
+    IN p_BookName VARCHAR(100)
+)
+BEGIN
+    DECLARE v_DateOfIssue DATE;
+    DECLARE v_Status CHAR(1);
+    DECLARE v_Days INT;
+    DECLARE v_FineAmt DECIMAL(10,2) DEFAULT 0;
+    DECLARE v_Today DATE DEFAULT CURDATE();
+
+    -- Exception Handler
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT '? Error occurred while calculating fine.' AS Message;
+    END;
+
+    START TRANSACTION;
+
+    -- Get the DateOfIssue and Status
+    SELECT DateOfIssue, Status
+    INTO v_DateOfIssue, v_Status
+    FROM Borrower
+    WHERE Roll_no = p_RollNo AND NameOfBook = p_BookName;
+
+    -- Check if record exists
+    IF v_DateOfIssue IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No matching borrower record found.';
+    END IF;
+
+    -- Calculate number of days since issue
+    SET v_Days = DATEDIFF(v_Today, v_DateOfIssue);
+
+    -- Calculate Fine Amount
+    IF v_Days > 30 THEN
+        SET v_FineAmt = (30 * 5) + ((v_Days - 30) * 50);
+    ELSEIF v_Days > 15 AND v_Days <= 30 THEN
+        SET v_FineAmt = v_Days * 5;
+    ELSE
+        SET v_FineAmt = 0;
+    END IF;
+
+    -- Update status to 'R' (Returned)
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Roll_no = p_RollNo AND NameOfBook = p_BookName;
+
+    -- If fine applies, insert into Fine table
+    IF v_FineAmt > 0 THEN
+        INSERT INTO Fine (Roll_no, Date, Amt)
+        VALUES (p_RollNo, v_Today, v_FineAmt);
+    END IF;
+
+    COMMIT;
+
+    -- Display result
+    SELECT CONCAT('Fine for Roll No ', p_RollNo, ' is Rs.', v_FineAmt, ' for ', v_Days, ' days.') AS Result;
+
+END$$
+
+DELIMITER ;
+
+INSERT INTO Borrower (Roll_no, Name, DateOfIssue, NameOfBook, Status)
+VALUES
+(101, 'Amit Kumar', '2025-10-01', 'DBMS', 'I'),
+(102, 'Neha Singh', '2025-09-25', 'C Programming', 'I'),
+(103, 'Raj Mehta', '2025-10-28', 'Networks', 'I');
+
+CALL Calc_Fine(101, 'DBMS');
+
+SELECT * FROM Borrower;
+SELECT * FROM Fine;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Q6.WriteaStoredProcedurenamelyproc_Gradeforthecategorizationofstudent. If marks scored by students in examination is <=1500 and marks>=990 then student will be placed in distinction category if marks scored are between 989 and 900 category is firstclass, if marks 899 and 825 category is Higher Second Class.
+ Stud_Marks(RollNo,name,total_marks) 
+Result (RollNo, Name, Class)
+ANS:
+CREATE TABLE Stud_Marks (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Total_Marks INT
+);
+
+CREATE TABLE Result (
+    RollNo INT,
+    Name VARCHAR(50),
+    Class VARCHAR(30)
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE proc_Grade (
+    IN p_RollNo INT
+)
+BEGIN
+    DECLARE v_Name VARCHAR(50);
+    DECLARE v_TotalMarks INT;
+    DECLARE v_Class VARCHAR(30);
+
+    -- Exception handler
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT '? Error occurred while assigning grade.' AS Message;
+    END;
+
+    START TRANSACTION;
+
+    -- Get the student's name and marks
+    SELECT Name, Total_Marks
+    INTO v_Name, v_TotalMarks
+    FROM Stud_Marks
+    WHERE RollNo = p_RollNo;
+
+    -- Check if record exists
+    IF v_Name IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No student record found for the given Roll Number.';
+    END IF;
+
+    -- Categorize based on marks
+    IF v_TotalMarks BETWEEN 990 AND 1500 THEN
+        SET v_Class = 'Distinction';
+    ELSEIF v_TotalMarks BETWEEN 900 AND 989 THEN
+        SET v_Class = 'First Class';
+    ELSEIF v_TotalMarks BETWEEN 825 AND 899 THEN
+        SET v_Class = 'Higher Second Class';
+    ELSE
+        SET v_Class = 'Fail';
+    END IF;
+
+    -- Insert into Result table
+    INSERT INTO Result (RollNo, Name, Class)
+    VALUES (p_RollNo, v_Name, v_Class);
+
+    COMMIT;
+
+    -- Display the result
+    SELECT CONCAT(v_Name, ' has secured ', v_Class, ' category.') AS Message;
+
+END$$
+
+DELIMITER ;
+
+INSERT INTO Stud_Marks (RollNo, Name, Total_Marks)
+VALUES
+(101, Ramesh Gaikawad, 1200),
+(102, 'Gahininath Pokale', 950),
+(103, 'Dilip Bhange', 870),
+(104, 'Mangesh Karande', 780);
+
+CALL proc_Grade(101);
+CALL proc_Grade(102);
+CALL proc_Grade(103);
+CALL proc_Grade(104);
+
+SELECT * FROM Result;
+
+
+
+
+
+
+
+Q7. Cursors: Write a PL/SQL block of code using Explicit Cursor College has decided to mark all those students detained(D) who are having attendance less than 75%. Whenever such update takes place, a record for the same is maintained in the d_stud table. Stud(rollnumber(4),attnumber(4),statusvarchar(1)); 
+d_stud (roll number (4), att number (4));
+
+ANS:
+CREATE TABLE Stud (
+    rollnumber INT PRIMARY KEY,
+    attnumber INT,
+    status CHAR(1)
+);
+
+CREATE TABLE d_stud (
+    rollnumber INT,
+    attnumber INT
+);
+INSERT INTO Stud VALUES 
+(1001, 80, 'P'),
+(1002, 72, 'P'),
+(1003, 60, 'P'),
+(1004, 90, 'P'),
+(1005, 74, 'P');
+DELIMITER $$
+
+CREATE PROCEDURE mark_detained()
+BEGIN
+    -- Declare cursor variables
+    DECLARE v_rollno INT;
+    DECLARE v_att INT;
+    DECLARE done INT DEFAULT 0;
+
+    -- Declare cursor for students with attendance < 75
+    DECLARE cur_stud CURSOR FOR
+        SELECT rollnumber, attnumber FROM Stud WHERE attnumber < 75;
+
+    -- Declare handler for cursor end
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    -- Open the cursor
+    OPEN cur_stud;
+
+    read_loop: LOOP
+        FETCH cur_stud INTO v_rollno, v_att;
+        IF done = 1 THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Update status to 'D' (Detained)
+        UPDATE Stud
+        SET status = 'D'
+        WHERE rollnumber = v_rollno;
+
+        -- Insert record into d_stud table for tracking
+        INSERT INTO d_stud (rollnumber, attnumber)
+        VALUES (v_rollno, v_att);
+    END LOOP;
+
+    CLOSE cur_stud;
+END$$
+
+DELIMITER ;SELECT * FROM d_stud;
+
+CALL mark_detained();
+
+SELECT * FROM Stud;
+SELECT * FROM d_stud;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Q8.Cursors: Write a PL/SQL block of code using parameterized Cursor that will merge the data available in the newly created table N_RollCall (roll number (10), name varchar (10)) with the data available in the table O_RollCall (roll number (10), name varchar (10)). If the data in the first table already exist in the second table, then that data should be skipped
+ANS:
+CREATE TABLE N_RollCall (
+    rollnumber INT,
+    name VARCHAR(10)
+);
+
+CREATE TABLE O_RollCall (
+    rollnumber INT,
+    name VARCHAR(10)
+);
+
+-- Old data
+INSERT INTO O_RollCall VALUES
+(101, 'Amit'),
+(102, 'Neha'),
+(103, 'Ravi');
+
+-- New data (some duplicates, some new)
+INSERT INTO N_RollCall VALUES
+(102, 'Neha'),
+(103, 'Ravi'),
+(104, 'Priya'),
+(105, 'Sanjay');
+
+DELIMITER $$
+
+CREATE PROCEDURE merge_rollcall(IN p_min_roll INT, IN p_max_roll INT)
+BEGIN
+    DECLARE v_roll INT;
+    DECLARE v_name VARCHAR(10);
+    DECLARE done INT DEFAULT 0;
+
+    DECLARE cur_merge CURSOR FOR
+        SELECT rollnumber, name
+        FROM N_RollCall
+        WHERE rollnumber BETWEEN p_min_roll AND p_max_roll;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    OPEN cur_merge;
+
+    read_loop: LOOP
+        FETCH cur_merge INTO v_roll, v_name;
+        IF done = 1 THEN
+            LEAVE read_loop;
+        END IF;
+
+        IF (SELECT COUNT(*) FROM O_RollCall WHERE rollnumber = v_roll) = 0 THEN
+            INSERT INTO O_RollCall (rollnumber, name)
+            VALUES (v_roll, v_name);
+        END IF;
+    END LOOP;
+
+    CLOSE cur_merge;
+END$$
+
+DELIMITER ;
+CALL merge_rollcall(100, 200);
+SELECT * FROM O_RollCall;
+Q9. Database Trigger(After update and After delete) Write a data base trigger on borrower(Rollinint,namevarchar(30),dateofissuedate,nameofbook varchar(30), status char (10)). The System should keep track of the records that are being updated or deleted. The old value of updated or delete records should be added in the Library_Audit(Rollinint,namechar(10),dateofissuedate,nameofbook char (10), status char, ts timestamp)
+ANS:
+CREATE TABLE borrower (
+    Rollin INT PRIMARY KEY,
+    name VARCHAR(30),
+    dateofissue DATE,
+    nameofbook VARCHAR(30),
+    status CHAR(10)
+);
+CREATE TABLE library_audit (
+    Rollin INT,
+    name CHAR(10),
+    dateofissue DATE,
+    nameofbook CHAR(10),
+    status CHAR(10),
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO borrower (Rollin, name, dateofissue, nameofbook, status)
+VALUES
+(101, 'Amit', '2025-10-01', 'DBMS', 'I'),
+(102, 'Neha', '2025-10-05', 'CProg', 'I'),
+(103, 'Raj',  '2025-09-25', 'OS',   'I');
+
+DELIMITER $$
+
+CREATE TRIGGER trg_borrower_after_update
+AFTER UPDATE ON borrower
+FOR EACH ROW
+BEGIN
+    INSERT INTO library_audit (Rollin, name, dateofissue, nameofbook, status)
+    VALUES (OLD.Rollin, OLD.name, OLD.dateofissue, OLD.nameofbook, OLD.status);
+END$$
+
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE TRIGGER trg_borrower_after_delete
+AFTER DELETE ON borrower
+FOR EACH ROW
+BEGIN
+    INSERT INTO library_audit (Rollin, name, dateofissue, nameofbook, status)
+    VALUES (OLD.Rollin, OLD.name, OLD.dateofissue, OLD.nameofbook, OLD.status);
+END$$
+
+DELIMITER ;
+
+
+UPDATE borrower
+SET status = 'R'
+WHERE Rollin = 101;
+
+DELETE FROM borrower
+WHERE Rollin = 102;
+
+SELECT * FROM borrower;
+SELECT * FROM library_audit;
